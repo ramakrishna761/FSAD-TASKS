@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ExamCore</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cyan:   #00eaff;
+  --green:  #00ff88;
+  --pink:   #ff2d78;
+  --purple: #a259ff;
+  --orange: #ff9900;
+  --red:    #ff4757;
+  --dark:   #060c1a;
+  --glass:  rgba(255,255,255,0.05);
+  --gbord:  rgba(255,255,255,0.10);
+}
+*{ box-sizing:border-box;margin:0;padding:0; }
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:var(--dark);
+  color:white;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.grid-bg{
+  position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(0,234,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,234,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+  animation:gridScroll 20s linear infinite;
+}
+@keyframes gridScroll{0%{background-position:0 0;}100%{background-position:40px 40px;}}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.18;z-index:0;animation:floatOrb 8s ease-in-out infinite alternate;}
+.orb1{width:400px;height:400px;background:#00eaff;top:-100px;left:-100px;animation-duration:9s;}
+.orb2{width:350px;height:350px;background:#ff2d78;bottom:-80px;right:-80px;animation-duration:11s;}
+.orb3{width:250px;height:250px;background:#a259ff;top:40%;left:60%;animation-duration:7s;}
+@keyframes floatOrb{from{transform:translate(0,0) scale(1);}to{transform:translate(30px,20px) scale(1.1);}}
+.drops{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.drops span{position:absolute;bottom:-150px;background:rgba(0,234,255,.18);border-radius:50%;box-shadow:inset 0 0 10px rgba(0,234,255,.4),0 0 18px rgba(0,234,255,.25);animation:rise 15s linear infinite;}
+.drops span:nth-child(1){width:22px;height:22px;left:5%;animation-duration:9s;animation-delay:0s;}
+.drops span:nth-child(2){width:14px;height:14px;left:12%;animation-duration:13s;animation-delay:1.5s;}
+.drops span:nth-child(3){width:28px;height:28px;left:18%;animation-duration:8s;animation-delay:3s;}
+.drops span:nth-child(4){width:10px;height:10px;left:24%;animation-duration:11s;animation-delay:.5s;}
+.drops span:nth-child(5){width:18px;height:18px;left:30%;animation-duration:14s;animation-delay:4s;}
+.drops span:nth-child(6){width:32px;height:32px;left:36%;animation-duration:10s;animation-delay:2s;}
+.drops span:nth-child(7){width:12px;height:12px;left:42%;animation-duration:7s;animation-delay:5s;}
+.drops span:nth-child(8){width:24px;height:24px;left:48%;animation-duration:12s;animation-delay:1s;}
+.drops span:nth-child(9){width:16px;height:16px;left:54%;animation-duration:9.5s;animation-delay:3.5s;}
+.drops span:nth-child(10){width:20px;height:20px;left:60%;animation-duration:11s;animation-delay:.8s;}
+.drops span:nth-child(11){width:30px;height:30px;left:66%;animation-duration:13s;animation-delay:2.5s;}
+.drops span:nth-child(12){width:11px;height:11px;left:71%;animation-duration:8.5s;animation-delay:4.5s;}
+.drops span:nth-child(13){width:26px;height:26px;left:76%;animation-duration:10s;animation-delay:1.2s;}
+.drops span:nth-child(14){width:15px;height:15px;left:81%;animation-duration:12s;animation-delay:3.8s;}
+.drops span:nth-child(15){width:20px;height:20px;left:86%;animation-duration:9s;animation-delay:.3s;}
+.drops span:nth-child(16){width:13px;height:13px;left:90%;animation-duration:14s;animation-delay:2.2s;}
+.drops span:nth-child(17){width:22px;height:22px;left:94%;animation-duration:7.5s;animation-delay:5.5s;}
+.drops span:nth-child(18){width:17px;height:17px;left:8%;animation-duration:11.5s;animation-delay:6s;}
+.drops span:nth-child(19){width:29px;height:29px;left:45%;animation-duration:10.5s;animation-delay:6.5s;}
+.drops span:nth-child(20){width:12px;height:12px;left:58%;animation-duration:8s;animation-delay:7s;}
+@keyframes rise{0%{transform:translateY(0) scale(1);opacity:0;}30%{opacity:.5;}100%{transform:translateY(-110vh) scale(1.3);opacity:0;}}
+
+.page{position:relative;z-index:1;}
+.centered-page{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:460px;}
+.card{background:var(--glass);border:1px solid var(--gbord);backdrop-filter:blur(20px);border-radius:20px;padding:36px 30px;box-shadow:0 0 60px rgba(0,234,255,.05);}
+
+/* LOGIN */
+.login-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px;}
+.login-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 20px rgba(0,234,255,.4);}
+.login-brand h1{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.login-tagline{text-align:center;font-size:13px;letter-spacing:2px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:30px;}
+.input-group{position:relative;margin-bottom:18px;}
+.input-group label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:7px;font-family:'Orbitron',monospace;}
+.input-group input{width:100%;background:rgba(0,234,255,.05);border:1px solid rgba(0,234,255,.2);border-radius:10px;padding:13px 18px 13px 46px;color:white;font-family:'Rajdhani',sans-serif;font-size:15px;letter-spacing:1px;outline:none;transition:all .3s;}
+.input-group input:focus{border-color:var(--cyan);background:rgba(0,234,255,.08);box-shadow:0 0 20px rgba(0,234,255,.15),inset 0 0 10px rgba(0,234,255,.05);}
+.input-group input::placeholder{color:rgba(255,255,255,.25);}
+.input-icon{position:absolute;bottom:13px;left:14px;font-size:18px;opacity:.5;}
+.scan-line{height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);margin:22px 0;opacity:.4;}
+.login-hint{text-align:center;margin-top:18px;font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.22);}
+.btn-login{width:100%;padding:15px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:var(--dark);border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;position:relative;overflow:hidden;transition:all .3s;box-shadow:0 0 30px rgba(0,234,255,.3);}
+.btn-login::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transform:translateX(-100%);transition:transform .5s;}
+.btn-login:hover::after{transform:translateX(100%);}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(0,234,255,.5);}
+.btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.login-error{text-align:center;color:var(--pink);font-size:13px;margin-top:10px;letter-spacing:.5px;min-height:18px;}
+
+/* HOME SHELL */
+.home-shell{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;}
+.tab-panels{flex:1;overflow-y:auto;padding:24px 18px 0;}
+.tab-panel{display:none;animation:fadeUp .35s ease;}
+.tab-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.tab-bar{position:relative;z-index:10;display:flex;background:rgba(6,12,26,.85);border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);padding:8px 0 12px;}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;cursor:pointer;background:none;border:none;color:rgba(255,255,255,.3);font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:all .25s;}
+.tab-btn .tab-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);transition:all .3s;}
+.tab-btn.active{color:white;}
+.tab-btn.active .tab-icon{background:rgba(0,234,255,.12);border-color:var(--cyan);box-shadow:0 0 18px rgba(0,234,255,.3);}
+.tab-btn:nth-child(2).active .tab-icon{background:rgba(0,255,136,.12);border-color:var(--green);box-shadow:0 0 18px rgba(0,255,136,.3);}
+.tab-btn:nth-child(3).active .tab-icon{background:rgba(162,89,255,.12);border-color:var(--purple);box-shadow:0 0 18px rgba(162,89,255,.3);}
+.tab-btn.active:nth-child(1){color:var(--cyan);}
+.tab-btn.active:nth-child(2){color:var(--green);}
+.tab-btn.active:nth-child(3){color:var(--purple);}
+
+/* PROFILE */
+.profile-topbar{display:flex;align-items:center;justify-content:space-between;max-width:480px;margin:0 auto 20px;}
+.profile-topbar-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.btn-logout{background:transparent;border:1.5px solid rgba(255,71,87,.4);color:rgba(255,71,87,.8);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;transition:all .25s;}
+.btn-logout:hover{background:rgba(255,71,87,.15);border-color:var(--red);color:var(--red);}
+.avatar-card{max-width:480px;margin:0 auto 22px;background:var(--glass);border:1px solid var(--gbord);backdrop-filter:blur(20px);border-radius:20px;padding:28px;text-align:center;box-shadow:0 0 50px rgba(0,234,255,.05);}
+.avatar-ring{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,var(--cyan),var(--purple));padding:3px;box-shadow:0 0 28px rgba(0,234,255,.35);}
+.avatar-inner{width:100%;height:100%;border-radius:50%;background:#0d1830;display:flex;align-items:center;justify-content:center;font-size:30px;}
+.profile-name{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
+.profile-role{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:18px;}
+.pstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pstat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 6px;}
+.pstat-val{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--cyan);}
+.pstat-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:3px;}
+
+/* QUICK ACTIONS */
+.quick-actions-section{max-width:480px;margin:0 auto 20px;}
+.quick-actions-label{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:14px;padding-left:2px;}
+.quick-actions-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
+.hex-btn-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform .3s;}
+.hex-btn-wrap:hover{transform:translateY(-4px);}
+.hex-shape{position:relative;width:100%;clip-path:polygon(50% 0%,97% 25%,97% 75%,50% 100%,3% 75%,3% 25%);background:linear-gradient(160deg,rgba(0,255,136,.18) 0%,rgba(0,234,255,.10) 100%);border:none;padding:32px 16px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:all .3s;aspect-ratio:0.9/1;}
+.hex-btn-wrap:hover .hex-shape{background:linear-gradient(160deg,rgba(0,255,136,.35) 0%,rgba(0,234,255,.22) 100%);filter:drop-shadow(0 0 18px rgba(0,255,136,.5));}
+.hex-outer{position:relative;width:100%;}
+.hex-outer::before{content:'';position:absolute;inset:-2px;clip-path:polygon(50% 0%,97% 25%,97% 75%,50% 100%,3% 75%,3% 25%);background:linear-gradient(160deg,rgba(0,255,136,.6),rgba(0,234,255,.5));z-index:0;transition:all .3s;}
+.hex-btn-wrap:hover .hex-outer::before{background:linear-gradient(160deg,rgba(0,255,136,1),rgba(0,234,255,.9));}
+.hex-shape{position:relative;z-index:1;}
+.hex-icon{font-size:28px;filter:drop-shadow(0 0 8px rgba(0,255,136,.6));transition:transform .3s;}
+.hex-btn-wrap:hover .hex-icon{transform:scale(1.2);}
+.hex-label{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);text-align:center;line-height:1.3;text-shadow:0 0 12px rgba(0,255,136,.6);}
+.hex-sub{font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.35);text-align:center;}
+.shield-btn-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform .3s;}
+.shield-btn-wrap:hover{transform:translateY(-4px);}
+.shield-outer{position:relative;width:100%;}
+.shield-outer::before{content:'';position:absolute;inset:-2px;clip-path:polygon(50% 0%,100% 18%,100% 65%,50% 100%,0% 65%,0% 18%);background:linear-gradient(160deg,rgba(255,153,0,.7),rgba(162,89,255,.6));z-index:0;transition:all .3s;}
+.shield-btn-wrap:hover .shield-outer::before{background:linear-gradient(160deg,rgba(255,153,0,1),rgba(162,89,255,.95));}
+.shield-shape{position:relative;z-index:1;width:100%;clip-path:polygon(50% 0%,100% 18%,100% 65%,50% 100%,0% 65%,0% 18%);background:linear-gradient(160deg,rgba(255,153,0,.18) 0%,rgba(162,89,255,.12) 100%);padding:32px 16px 36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:all .3s;aspect-ratio:0.9/1;}
+.shield-btn-wrap:hover .shield-shape{background:linear-gradient(160deg,rgba(255,153,0,.35) 0%,rgba(162,89,255,.22) 100%);filter:drop-shadow(0 0 18px rgba(255,153,0,.5));}
+.shield-icon{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,153,0,.6));transition:transform .3s;}
+.shield-btn-wrap:hover .shield-icon{transform:scale(1.2);}
+.shield-label{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);text-align:center;line-height:1.3;text-shadow:0 0 12px rgba(255,153,0,.6);}
+.shield-sub{font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.35);text-align:center;}
+@keyframes pulseGreen{0%,100%{filter:drop-shadow(0 0 14px rgba(0,255,136,.4));}50%{filter:drop-shadow(0 0 28px rgba(0,255,136,.9));}}
+@keyframes pulseOrange{0%,100%{filter:drop-shadow(0 0 14px rgba(255,153,0,.4));}50%{filter:drop-shadow(0 0 28px rgba(255,153,0,.9));}}
+.hex-btn-wrap:hover .hex-outer{animation:pulseGreen .9s ease-in-out infinite;}
+.shield-btn-wrap:hover .shield-outer{animation:pulseOrange .9s ease-in-out infinite;}
+
+/* EXAMINATION TAB */
+.tab-heading{max-width:480px;margin:0 auto 18px;font-family:'Orbitron',monospace;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.exam-info-card{max-width:480px;margin:0 auto 16px;background:var(--glass);border:1px solid var(--gbord);backdrop-filter:blur(16px);border-radius:18px;padding:24px;}
+.exam-info-title{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'Orbitron',monospace;margin-bottom:14px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.info-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;}
+.info-chip-val{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--cyan);}
+.info-chip-lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:3px;}
+.btn-big{display:block;width:100%;padding:16px;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;position:relative;overflow:hidden;transition:all .35s;margin-bottom:10px;}
+.btn-big span{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:10px;}
+.btn-big::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;transition:left .35s;z-index:0;}
+.btn-big:hover::before{left:0;}
+.bb-green{color:var(--green);border:1.5px solid var(--green);background:transparent;box-shadow:0 0 15px rgba(0,255,136,.15);}
+.bb-green::before{background:var(--green);}
+.bb-green:hover{color:var(--dark);box-shadow:0 0 40px rgba(0,255,136,.5);transform:translateY(-2px);}
+.bb-orange{color:var(--orange);border:1.5px solid var(--orange);background:transparent;box-shadow:0 0 15px rgba(255,153,0,.15);}
+.bb-orange::before{background:var(--orange);}
+.bb-orange:hover{color:var(--dark);box-shadow:0 0 40px rgba(255,153,0,.5);transform:translateY(-2px);}
+.history-list-wrap{max-width:480px;margin:0 auto;}
+.history-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:10px;}
+.attempt-label{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;}
+.history-row{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.45);padding:2px 0;}
+.history-row span:last-child{color:rgba(255,255,255,.85);}
+.pass{color:var(--green)!important;}
+.fail{color:var(--pink)!important;}
+.no-history{text-align:center;padding:30px 0;color:rgba(255,255,255,.28);font-size:13px;letter-spacing:1px;}
+
+/* ACCOUNT */
+.tab-heading-purple{max-width:480px;margin:0 auto 18px;font-family:'Orbitron',monospace;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.menu-list{max-width:480px;margin:0 auto 20px;display:flex;flex-direction:column;gap:9px;}
+.menu-item{display:flex;align-items:center;gap:14px;background:var(--glass);border:1px solid var(--gbord);backdrop-filter:blur(12px);border-radius:14px;padding:15px 16px;cursor:pointer;transition:all .25s;position:relative;}
+.menu-item::after{content:'›';position:absolute;right:16px;font-size:20px;color:rgba(255,255,255,.18);transition:all .25s;}
+.menu-item:hover{transform:translateX(5px);border-color:var(--ic,var(--cyan));}
+.menu-item:hover::after{right:12px;color:var(--ic,var(--cyan));}
+.menu-item:hover .micon{box-shadow:0 0 16px var(--ic,var(--cyan));}
+.micon{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:box-shadow .25s;}
+.mtext{flex:1;}
+.mtitle{font-size:14px;font-weight:600;color:rgba(255,255,255,.88);margin-bottom:2px;}
+.mdesc{font-size:12px;color:rgba(255,255,255,.32);letter-spacing:.3px;}
+.mbadge{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:1px;margin-right:22px;}
+.account-info{max-width:480px;margin:0 auto 16px;background:var(--glass);border:1px solid var(--gbord);backdrop-filter:blur(16px);border-radius:18px;padding:22px;display:flex;align-items:center;gap:16px;}
+.ai-avatar{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 0 16px rgba(162,89,255,.3);}
+.ai-name{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:2px;color:white;}
+.ai-sub{font-size:12px;color:rgba(255,255,255,.3);margin-top:3px;letter-spacing:.5px;}
+.sec-label{max-width:480px;margin:0 auto 8px;padding-left:4px;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.22);}
+
+/* EXAM FLOW */
+.fullscreen-page{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--dark);}
+.exam-wrapper{width:100%;max-width:560px;}
+.exam-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.exam-logo{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+#timer{font-family:'Orbitron',monospace;font-size:15px;color:var(--cyan);background:rgba(0,234,255,.1);border:1px solid rgba(0,234,255,.3);padding:7px 14px;border-radius:8px;box-shadow:0 0 15px rgba(0,234,255,.2);letter-spacing:2px;}
+.progress-wrap{margin-bottom:20px;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:7px;font-family:'Orbitron',monospace;}
+.progress-track{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:4px;transition:width .4s;box-shadow:0 0 10px rgba(0,234,255,.5);}
+.dot-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:22px;}
+.dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);transition:all .3s;cursor:pointer;}
+.dot.answered{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 6px rgba(0,234,255,.6);}
+.dot.current{background:var(--purple);border-color:var(--purple);box-shadow:0 0 8px rgba(162,89,255,.7);transform:scale(1.3);}
+.question-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:28px;margin-bottom:18px;animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(28px);}to{opacity:1;transform:translateX(0);}}
+.q-number{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.q-number::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,234,255,.3),transparent);}
+.q-text{font-size:16px;font-weight:600;color:rgba(255,255,255,.92);line-height:1.5;margin-bottom:20px;}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.option-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:15px 10px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;cursor:pointer;transition:all .25s;user-select:none;min-height:86px;text-align:center;}
+.option-btn:hover{background:rgba(0,234,255,.07);border-color:rgba(0,234,255,.35);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,234,255,.1);}
+.option-alpha{width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(255,255,255,.45);transition:all .25s;}
+.option-label{font-size:13px;font-weight:600;color:rgba(255,255,255,.62);transition:color .25s;line-height:1.3;}
+.option-btn:hover .option-alpha{border-color:var(--cyan);color:var(--cyan);}
+.option-btn:hover .option-label{color:rgba(255,255,255,.9);}
+.option-btn.selected{background:rgba(0,234,255,.13);border-color:var(--cyan);box-shadow:0 0 22px rgba(0,234,255,.18),inset 0 0 14px rgba(0,234,255,.07);transform:translateY(-2px);}
+.option-btn.selected .option-alpha{background:var(--cyan);border-color:var(--cyan);color:var(--dark);box-shadow:0 0 12px rgba(0,234,255,.6);}
+.option-btn.selected .option-label{color:white;font-weight:700;}
+.nav-row{display:flex;gap:12px;}
+.btn-nav{flex:1;padding:13px;background:transparent;border-radius:10px;cursor:pointer;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all .3s;}
+.btn-prev{color:rgba(255,255,255,.45);border:1.5px solid rgba(255,255,255,.14);}
+.btn-prev:hover:not(:disabled){color:white;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.06);}
+.btn-prev:disabled{opacity:.25;cursor:not-allowed;}
+.btn-next{color:var(--cyan);border:1.5px solid var(--cyan);box-shadow:0 0 12px rgba(0,234,255,.15);}
+.btn-next:hover{background:var(--cyan);color:var(--dark);box-shadow:0 0 30px rgba(0,234,255,.5);transform:translateY(-2px);}
+.btn-finish{color:var(--green);border:1.5px solid var(--green);box-shadow:0 0 12px rgba(0,255,136,.15);}
+.btn-finish:hover{background:var(--green);color:var(--dark);box-shadow:0 0 30px rgba(0,255,136,.5);transform:translateY(-2px);}
+
+/* RESULT */
+.scrollable-page{max-width:520px;margin:40px auto 60px;padding:0 18px;}
+.result-title{font-family:'Orbitron',monospace;font-size:17px;text-align:center;letter-spacing:3px;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:22px;}
+.result-stats{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:18px;}
+.stat-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;text-align:center;}
+.stat-val{font-family:'Orbitron',monospace;font-size:26px;font-weight:700;color:var(--cyan);}
+.stat-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px;}
+.status-badge{text-align:center;padding:18px;margin-bottom:18px;border-radius:12px;font-family:'Orbitron',monospace;font-size:24px;font-weight:900;letter-spacing:6px;}
+.pass-badge{color:var(--green);border:1px solid rgba(0,255,136,.3);background:rgba(0,255,136,.06);box-shadow:0 0 30px rgba(0,255,136,.15);}
+.fail-badge{color:var(--pink);border:1px solid rgba(255,45,120,.3);background:rgba(255,45,120,.06);box-shadow:0 0 30px rgba(255,45,120,.15);}
+.btn-home{display:block;width:100%;padding:14px;background:transparent;color:var(--cyan);border:1.5px solid var(--cyan);border-radius:10px;cursor:pointer;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;transition:all .3s;}
+.btn-home:hover{background:var(--cyan);color:var(--dark);box-shadow:0 0 30px rgba(0,234,255,.5);transform:translateY(-2px);}
+.tab-panels-inner{padding-bottom:30px;}
+
+/* BEST SCORE CARD */
+.best-score-card{max-width:480px;margin:0 auto 18px;background:linear-gradient(135deg,rgba(0,234,255,.07) 0%,rgba(162,89,255,.10) 50%,rgba(0,255,136,.07) 100%);border:1px solid rgba(0,234,255,.25);backdrop-filter:blur(20px);border-radius:20px;padding:20px 24px;box-shadow:0 0 40px rgba(0,234,255,.08),inset 0 0 30px rgba(0,234,255,.03);position:relative;overflow:hidden;}
+.best-score-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(0,234,255,.12),transparent 70%);pointer-events:none;}
+.best-score-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.10),transparent 70%);pointer-events:none;}
+.bsc-inner{display:flex;align-items:center;gap:18px;position:relative;z-index:1;}
+.bsc-trophy{width:62px;height:62px;border-radius:16px;flex-shrink:0;background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(255,153,0,.12));border:1px solid rgba(255,215,0,.35);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 20px rgba(255,215,0,.2);animation:trophyPulse 3s ease-in-out infinite;}
+@keyframes trophyPulse{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.2);}50%{box-shadow:0 0 35px rgba(255,215,0,.45),0 0 60px rgba(255,153,0,.15);}}
+.bsc-text{flex:1;}
+.bsc-label{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px;}
+.bsc-value{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#ffd700,#ffaa00,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:4px;}
+.bsc-value.empty{font-size:20px;background:linear-gradient(90deg,rgba(255,255,255,.3),rgba(255,255,255,.15));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.bsc-sub{font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.3);}
+.bsc-bar-wrap{margin-top:14px;position:relative;z-index:1;}
+.bsc-bar-track{height:5px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
+.bsc-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#ffd700,#00ff88);box-shadow:0 0 8px rgba(255,215,0,.5);transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+.bsc-bar-labels{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.22);font-family:'Orbitron',monospace;}
+.bsc-new-badge{position:absolute;top:14px;right:16px;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;color:#ffd700;border:1px solid rgba(255,215,0,.4);background:rgba(255,215,0,.1);display:none;animation:badgePop .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes badgePop{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+/* INSTRUCTIONS */
+.instr-overlay{position:fixed;inset:0;z-index:100;background:var(--dark);display:none;flex-direction:column;animation:instrIn .4s cubic-bezier(.22,1,.36,1);}
+.instr-overlay.active{display:flex;}
+@keyframes instrIn{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+.instr-bg-deco{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.instr-bg-deco::before{content:'';position:absolute;top:-120px;left:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,234,255,.07),transparent 65%);}
+.instr-bg-deco::after{content:'';position:absolute;bottom:-100px;right:-80px;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(162,89,255,.07),transparent 65%);}
+.instr-topbar{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0;}
+.instr-back-btn{display:flex;align-items:center;gap:8px;cursor:pointer;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:9px 16px;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.55);transition:all .25s;}
+.instr-back-btn:hover{color:var(--cyan);border-color:rgba(0,234,255,.4);background:rgba(0,234,255,.07);}
+.instr-title-bar{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.instr-spacer{width:80px;}
+.instr-scroll{position:relative;z-index:1;flex:1;overflow-y:auto;padding:28px 24px 40px;max-width:540px;width:100%;margin:0 auto;}
+.instr-hero{text-align:center;padding:30px 20px 24px;border:1px solid rgba(0,234,255,.15);border-radius:20px;margin-bottom:28px;background:rgba(0,234,255,.03);position:relative;overflow:hidden;}
+.instr-hero::before{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.4;}
+.instr-hero-icon{font-size:52px;margin-bottom:14px;display:block;filter:drop-shadow(0 0 16px rgba(0,234,255,.5));animation:heroFloat 3s ease-in-out infinite alternate;}
+@keyframes heroFloat{from{transform:translateY(0);}to{transform:translateY(-8px);}}
+.instr-hero-title{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;letter-spacing:4px;text-transform:uppercase;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+.instr-hero-sub{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.instr-section-label{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:12px;padding-left:2px;}
+.instr-rules{display:flex;flex-direction:column;gap:10px;margin-bottom:26px;}
+.instr-rule{display:flex;align-items:flex-start;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:16px 18px;transition:all .25s;animation:ruleSlide .4s ease both;}
+.instr-rule:hover{border-color:rgba(0,234,255,.2);background:rgba(0,234,255,.04);transform:translateX(5px);}
+@keyframes ruleSlide{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+.instr-rule:nth-child(1){animation-delay:.05s;}.instr-rule:nth-child(2){animation-delay:.10s;}.instr-rule:nth-child(3){animation-delay:.15s;}.instr-rule:nth-child(4){animation-delay:.20s;}.instr-rule:nth-child(5){animation-delay:.25s;}.instr-rule:nth-child(6){animation-delay:.30s;}
+.instr-num{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;}
+.instr-rule-body{flex:1;}
+.instr-rule-title{font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:3px;}
+.instr-rule-desc{font-size:12px;letter-spacing:.3px;color:rgba(255,255,255,.38);line-height:1.5;}
+.instr-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px;}
+.instr-chip{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 10px;text-align:center;}
+.instr-chip-val{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;margin-bottom:4px;}
+.instr-chip-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);}
+.instr-start-btn{display:block;width:100%;padding:17px;background:linear-gradient(90deg,var(--cyan),var(--purple));color:var(--dark);border:none;border-radius:14px;cursor:pointer;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;position:relative;overflow:hidden;transition:all .3s;box-shadow:0 0 30px rgba(0,234,255,.3);margin-top:4px;}
+.instr-start-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:translateX(-100%);transition:transform .5s;}
+.instr-start-btn:hover::after{transform:translateX(100%);}
+.instr-start-btn:hover{box-shadow:0 0 50px rgba(0,234,255,.55);transform:translateY(-2px);}
+
+/* LOADING SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<div class="drops">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- LOGIN -->
+<div class="page centered-page" id="loginPage">
+  <div class="card">
+    <div class="login-brand">
+      <div class="login-icon">🧠</div>
+      <h1>ExamCore</h1>
+    </div>
+    <p class="login-tagline">Secure Examination Portal</p>
+    <div class="input-group">
+      <label>Username</label>
+      <span class="input-icon">👤</span>
+      <input type="text" id="username" placeholder="Enter your username" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <span class="input-icon">🔒</span>
+      <input type="password" id="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <div class="scan-line"></div>
+    <button class="btn-login" id="loginBtn" onclick="login()">⚡ Access Portal</button>
+    <p class="login-error" id="loginError"></p>
+    <p class="login-hint">Secured · Monitored · Certified</p>
+  </div>
+</div>
+
+<!-- HOME SHELL -->
+<div id="homeShell" class="home-shell" style="display:none;">
+  <div class="tab-panels" id="tabPanels">
+    <div class="tab-panels-inner">
+
+      <!-- PROFILE TAB -->
+      <div class="tab-panel active" id="panel-profile">
+        <div class="profile-topbar">
+          <span class="profile-topbar-title">My Profile</span>
+          <button class="btn-logout" onclick="logout()">⏻ Logout</button>
+        </div>
+        <div class="avatar-card">
+          <div class="avatar-ring"><div class="avatar-inner">🎓</div></div>
+          <div class="profile-name" id="profileName">Student</div>
+          <div class="profile-role">ExamCore Candidate</div>
+          <div class="pstats">
+            <div class="pstat"><div class="pstat-val" id="statAttempts">0</div><div class="pstat-lbl">Attempts</div></div>
+            <div class="pstat"><div class="pstat-val" id="statBest">—</div><div class="pstat-lbl">Best %</div></div>
+            <div class="pstat"><div class="pstat-val" id="statPassed">0</div><div class="pstat-lbl">Passed</div></div>
+          </div>
+        </div>
+
+        <!-- BEST SCORE CARD -->
+        <div class="best-score-card" id="bestScoreCard">
+          <div class="bsc-new-badge" id="bscBadge">⭐ NEW BEST</div>
+          <div class="bsc-inner">
+            <div class="bsc-trophy">🏆</div>
+            <div class="bsc-text">
+              <div class="bsc-label">Personal Best Score</div>
+              <div class="bsc-value empty" id="bscValue">No attempts yet</div>
+              <div class="bsc-sub" id="bscSub">Complete an exam to set your record</div>
+            </div>
+          </div>
+          <div class="bsc-bar-wrap">
+            <div class="bsc-bar-track"><div class="bsc-bar-fill" id="bscBarFill" style="width:0%"></div></div>
+            <div class="bsc-bar-labels"><span>0%</span><span>Pass: 50%</span><span>100%</span></div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions-section">
+          <div class="quick-actions-label">Quick Actions</div>
+          <div class="quick-actions-row">
+            <div class="hex-btn-wrap" onclick="switchTab('examination');startExam()">
+              <div class="hex-outer">
+                <div class="hex-shape">
+                  <div class="hex-icon">▶</div>
+                  <div class="hex-label">Start<br>Exam</div>
+                  <div class="hex-sub">12 questions</div>
+                </div>
+              </div>
+            </div>
+            <div class="shield-btn-wrap" onclick="switchTab('examination')">
+              <div class="shield-outer">
+                <div class="shield-shape">
+                  <div class="shield-icon">📋</div>
+                  <div class="shield-label">My<br>History</div>
+                  <div class="shield-sub">View results</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXAMINATION TAB -->
+      <div class="tab-panel" id="panel-examination">
+        <div class="tab-heading">Examination</div>
+        <div class="exam-info-card">
+          <div class="exam-info-title">Exam Details</div>
+          <div class="info-grid">
+            <div class="info-chip"><div class="info-chip-val">12</div><div class="info-chip-lbl">Questions</div></div>
+            <div class="info-chip"><div class="info-chip-val">2:00</div><div class="info-chip-lbl">Time Limit</div></div>
+            <div class="info-chip"><div class="info-chip-val">50%</div><div class="info-chip-lbl">Pass Mark</div></div>
+            <div class="info-chip"><div class="info-chip-val" id="examTabAttempts">0</div><div class="info-chip-lbl">My Attempts</div></div>
+          </div>
+          <button class="btn-big bb-green" onclick="startExam()"><span>▶&nbsp; Start New Exam</span></button>
+        </div>
+        <div class="tab-heading" style="margin-top:10px;">Result History</div>
+        <div class="history-list-wrap" id="historyTabList"></div>
+        <button class="btn-big bb-orange" style="max-width:480px;margin:0 auto;display:block;" onclick="clearHistory()">
+          <span>🗑&nbsp; Clear History</span>
+        </button>
+      </div>
+
+      <!-- ACCOUNT TAB -->
+      <div class="tab-panel" id="panel-account">
+        <div class="tab-heading-purple">Account</div>
+        <div class="account-info">
+          <div class="ai-avatar">👤</div>
+          <div>
+            <div class="ai-name" id="accountName">Student</div>
+            <div class="ai-sub">ExamCore Candidate · Active</div>
+          </div>
+        </div>
+        <div class="sec-label">Settings</div>
+        <div class="menu-list">
+          <div class="menu-item" style="--ic:var(--cyan)" onclick="showInstructions()">
+            <div class="micon">📖</div>
+            <div class="mtext"><div class="mtitle">Exam Instructions</div><div class="mdesc">Rules, tips and guidelines</div></div>
+          </div>
+          <div class="menu-item" style="--ic:var(--purple)" onclick="showAbout()">
+            <div class="micon">ℹ️</div>
+            <div class="mtext"><div class="mtitle">About ExamCore</div><div class="mdesc">Platform version and info</div></div>
+            <span class="mbadge" style="color:var(--cyan);border:1px solid rgba(0,234,255,.3);background:rgba(0,234,255,.08)">v2.0</span>
+          </div>
+          <div class="menu-item" style="--ic:var(--orange)">
+            <div class="micon">🎨</div>
+            <div class="mtext"><div class="mtitle">Theme</div><div class="mdesc">Cyberpunk Neon — active</div></div>
+            <span class="mbadge" style="color:var(--orange);border:1px solid rgba(255,153,0,.3);background:rgba(255,153,0,.08)">ON</span>
+          </div>
+        </div>
+        <div class="sec-label" style="margin-top:4px;">Danger Zone</div>
+        <div class="menu-list">
+          <div class="menu-item" style="--ic:var(--red)" onclick="clearHistory()">
+            <div class="micon">🗑</div>
+            <div class="mtext"><div class="mtitle">Clear All Data</div><div class="mdesc">Delete all exam history permanently</div></div>
+          </div>
+          <div class="menu-item" style="--ic:var(--red)" onclick="logout()">
+            <div class="micon">⏻</div>
+            <div class="mtext"><div class="mtitle">Logout</div><div class="mdesc">Return to login screen</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="tab-bar">
+    <button class="tab-btn active" id="tab-profile" onclick="switchTab('profile')">
+      <div class="tab-icon">👤</div>Profile
+    </button>
+    <button class="tab-btn" id="tab-examination" onclick="switchTab('examination')">
+      <div class="tab-icon">📝</div>Exam
+    </button>
+    <button class="tab-btn" id="tab-account" onclick="switchTab('account')">
+      <div class="tab-icon">⚙️</div>Account
+    </button>
+  </nav>
+</div>
+
+<!-- EXAM PAGE -->
+<div class="fullscreen-page" id="examPage" style="display:none;">
+  <div class="exam-wrapper">
+    <div class="exam-topbar">
+      <span class="exam-logo">ExamCore</span>
+      <div id="timer">02:00</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progressText">Question 1 of 12</span>
+        <span id="answeredText">0 answered</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:8.33%"></div></div>
+    </div>
+    <div class="dot-row" id="dotRow"></div>
+    <div id="questionCard" class="question-card"></div>
+    <div class="nav-row">
+      <button class="btn-nav btn-prev" id="btnPrev" onclick="prevQuestion()">← Prev</button>
+      <button class="btn-nav btn-next" id="btnNext" onclick="nextQuestion()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT PAGE -->
+<div class="page" id="resultPage" style="display:none;position:fixed;inset:0;z-index:20;background:var(--dark);overflow-y:auto;">
+  <div style="max-width:480px;margin:40px auto;padding:0 18px;">
+    <div class="card">
+      <p class="result-title">Your Result</p>
+      <div id="result"></div>
+      <button class="btn-home" onclick="goHome()">← Return to Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS OVERLAY -->
+<div class="instr-overlay" id="instrOverlay">
+  <div class="instr-bg-deco"></div>
+  <div class="grid-bg" style="opacity:.5"></div>
+  <div class="instr-topbar">
+    <button class="instr-back-btn" onclick="closeInstructions()">← Back</button>
+    <span class="instr-title-bar">Instructions</span>
+    <div class="instr-spacer"></div>
+  </div>
+  <div class="instr-scroll">
+    <div class="instr-hero">
+      <span class="instr-hero-icon">📖</span>
+      <div class="instr-hero-title">Exam Guide</div>
+      <div class="instr-hero-sub">Read before you begin</div>
+    </div>
+    <div class="instr-section-label">Exam Overview</div>
+    <div class="instr-chips" style="margin-bottom:26px;">
+      <div class="instr-chip"><div class="instr-chip-val" style="color:var(--cyan)">12</div><div class="instr-chip-lbl">Questions</div></div>
+      <div class="instr-chip"><div class="instr-chip-val" style="color:var(--orange)">2:00</div><div class="instr-chip-lbl">Minutes</div></div>
+      <div class="instr-chip"><div class="instr-chip-val" style="color:var(--green)">50%</div><div class="instr-chip-lbl">To Pass</div></div>
+    </div>
+    <div class="instr-section-label">Rules &amp; Guidelines</div>
+    <div class="instr-rules">
+      <div class="instr-rule">
+        <div class="instr-num" style="background:rgba(0,234,255,.12);border:1px solid rgba(0,234,255,.3);color:var(--cyan)">01</div>
+        <div class="instr-rule-body"><div class="instr-rule-title">One Question at a Time</div><div class="instr-rule-desc">Each screen shows a single question. Focus on it before moving forward.</div></div>
+      </div>
+      <div class="instr-rule">
+        <div class="instr-num" style="background:rgba(255,153,0,.12);border:1px solid rgba(255,153,0,.3);color:var(--orange)">02</div>
+        <div class="instr-rule-body"><div class="instr-rule-title">Timed — 2 Minutes Total</div><div class="instr-rule-desc">The countdown timer starts immediately. The exam auto-submits when time runs out.</div></div>
+      </div>
+      <div class="instr-rule">
+        <div class="instr-num" style="background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.3);color:var(--green)">03</div>
+        <div class="instr-rule-body"><div class="instr-rule-title">Select A / B / C / D</div><div class="instr-rule-desc">Tap any option card to select your answer. You can change it anytime before finishing.</div></div>
+      </div>
+      <div class="instr-rule">
+        <div class="instr-num" style="background:rgba(162,89,255,.12);border:1px solid rgba(162,89,255,.3);color:var(--purple)">04</div>
+        <div class="instr-rule-body"><div class="instr-rule-title">Free Navigation</div><div class="instr-rule-desc">Use Prev / Next buttons or tap the dots at the top to jump to any question freely.</div></div>
+      </div>
+      <div class="instr-rule">
+        <div class="instr-num" style="background:rgba(0,234,255,.12);border:1px solid rgba(0,234,255,.3);color:var(--cyan)">05</div>
+        <div class="instr-rule-body"><div class="instr-rule-title">Score ≥ 50% to Pass</div><div class="instr-rule-desc">Getting 6 or more correct out of 12 earns you a PASS. Below that is FAIL.</div></div>
+      </div>
+      <div class="instr-rule">
+        <div class="instr-num" style="background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);color:#ffd700">06</div>
+        <div class="instr-rule-body"><div class="instr-rule-title">Finish on the Last Question</div><div class="instr-rule-desc">When you reach Q12, the Next button becomes ✔ Finish. Press it to submit your exam.</div></div>
+      </div>
+    </div>
+    <div style="background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.18);border-radius:14px;padding:16px 18px;margin-bottom:28px;">
+      <div style="font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:6px;">💡 Pro Tip</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.6;letter-spacing:.3px;">Answer all questions before checking previous ones. The dot tracker at the top highlights unanswered questions in grey — aim to make them all cyan!</div>
+    </div>
+    <button class="instr-start-btn" onclick="closeInstructions();switchTab('examination');startExam()">⚡ &nbsp; Start Exam Now</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIG — point to your backend
+// ─────────────────────────────────────────────
+const API = 'http://localhost:3000/api';   // ← change host/port if needed
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let currentUser   = null;   // { id, username, display_name, role }
+let quizData      = [];     // loaded from DB via /api/questions
+let examConfig    = {};     // { total_questions, time_limit_sec, pass_percentage }
+let totalSeconds  = 120;
+let timerInterval = null;
+let examStartedAt = null;
+let currentQ      = 0;
+let answers       = [];     // array of selected option indices (null = skipped)
+let lastResult    = null;   // { score, total, percentage, status, isNewBest }
+
+const KEYS = ['A','B','C','D'];
+
+// ─────────────────────────────────────────────
+//  API HELPERS
+// ─────────────────────────────────────────────
+async function apiFetch(path, opts={}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  return res.json();
+}
+
+// ─────────────────────────────────────────────
+//  AUTH
+// ─────────────────────────────────────────────
+async function login() {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+  const errEl = document.getElementById('loginError');
+  const btn   = document.getElementById('loginBtn');
+  errEl.textContent = '';
+
+  if (!u || !p) { errEl.textContent = 'Please enter username and password.'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Authenticating...';
+
+  const data = await apiFetch('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username: u, password: p }),
+  }).catch(() => null);
+
+  btn.disabled = false;
+  btn.innerHTML = '⚡ Access Portal';
+
+  if (!data || !data.success) {
+    errEl.textContent = data?.message || 'Connection failed. Is the server running?';
+    return;
+  }
+
+  currentUser = data.user;
+  document.getElementById('loginPage').style.display   = 'none';
+  document.getElementById('homeShell').style.display   = 'flex';
+  document.getElementById('profileName').textContent   = currentUser.display_name.toUpperCase();
+  document.getElementById('accountName').textContent   = currentUser.display_name.toUpperCase();
+  switchTab('profile');
+  loadProfileStats();
+}
+
+function logout() {
+  currentUser = null;
+  quizData    = [];
+  document.getElementById('homeShell').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'block';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('loginError').textContent = '';
+  switchTab('profile');
+}
+
+// ─────────────────────────────────────────────
+//  PROFILE STATS  (from DB)
+// ─────────────────────────────────────────────
+async function loadProfileStats(isNewBest = false) {
+  if (!currentUser) return;
+  const data = await apiFetch(`/stats?user_id=${currentUser.id}`).catch(() => null);
+  if (!data?.success) return;
+
+  const s = data.stats;
+  const attempts = parseInt(s.total_attempts) || 0;
+  const passed   = parseInt(s.total_passed)   || 0;
+  const best     = s.best_percentage ? parseFloat(s.best_percentage) : null;
+
+  document.getElementById('statAttempts').textContent    = attempts;
+  document.getElementById('statPassed').textContent      = passed;
+  document.getElementById('statBest').textContent        = best !== null ? best.toFixed(0)+'%' : '—';
+  document.getElementById('examTabAttempts').textContent = attempts;
+
+  updateBestScoreCard(best, isNewBest);
+}
+
+function updateBestScoreCard(best, isNew) {
+  const valEl = document.getElementById('bscValue');
+  const subEl = document.getElementById('bscSub');
+  const barEl = document.getElementById('bscBarFill');
+  const badge = document.getElementById('bscBadge');
+  if (best === null || best === undefined) {
+    valEl.className   = 'bsc-value empty';
+    valEl.textContent = 'No attempts yet';
+    subEl.textContent = 'Complete an exam to set your record';
+    barEl.style.width = '0%';
+    badge.style.display = 'none';
+    return;
+  }
+  valEl.className   = 'bsc-value';
+  valEl.textContent = best.toFixed(1) + '%';
+  const score = Math.round((best / 100) * 12);
+  subEl.textContent = `${score} / 12 correct · ${best >= 50 ? '🏅 Pass level reached' : 'Keep pushing — 50% to pass'}`;
+  setTimeout(() => { barEl.style.width = best + '%'; }, 100);
+  badge.style.display = isNew ? 'block' : 'none';
+  if (isNew) setTimeout(() => { badge.style.display = 'none'; }, 4000);
+}
+
+// ─────────────────────────────────────────────
+//  HISTORY  (from DB)
+// ─────────────────────────────────────────────
+async function loadHistory() {
+  if (!currentUser) return;
+  const list = document.getElementById('historyTabList');
+  list.innerHTML = '<div class="no-history"><span class="spinner"></span> Loading...</div>';
+
+  const data = await apiFetch(`/attempts?user_id=${currentUser.id}`).catch(() => null);
+
+  if (!data?.success || !data.attempts.length) {
+    list.innerHTML = '<div class="no-history">No attempts recorded yet.</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  data.attempts.forEach((h, i) => {
+    const num = data.attempts.length - i;
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `
+      <p class="attempt-label">Attempt ${num}</p>
+      <div class="history-row"><span>Score</span><span>${h.score} / ${h.total_questions}</span></div>
+      <div class="history-row"><span>Percentage</span><span>${parseFloat(h.percentage).toFixed(2)}%</span></div>
+      <div class="history-row"><span>Status</span><span class="${h.status==='PASS'?'pass':'fail'}">${h.status}</span></div>
+      <div class="history-row"><span>Time Taken</span><span>${h.time_taken_sec ? h.time_taken_sec+'s' : 'Timed out'}</span></div>
+      <div class="history-row"><span>Date</span><span>${new Date(h.submitted_at).toLocaleString()}</span></div>`;
+    list.appendChild(div);
+  });
+}
+
+async function clearHistory() {
+  if (!confirm('Delete all exam history? This cannot be undone.')) return;
+  // Note: implement DELETE /api/attempts?user_id=X endpoint if needed
+  // For now we inform admin to delete via DB directly
+  alert('To clear history, run:\nDELETE FROM exam_attempts WHERE user_id = ' + currentUser.id + ';\nin your MySQL database.');
+}
+
+// ─────────────────────────────────────────────
+//  TAB SWITCHING
+// ─────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('tabPanels').scrollTop = 0;
+  if (name === 'examination') loadHistory();
+  if (name === 'profile')     loadProfileStats();
+}
+
+// ─────────────────────────────────────────────
+//  EXAM — load questions from DB then start
+// ─────────────────────────────────────────────
+async function startExam() {
+  // Show loading state
+  document.getElementById('homeShell').style.display = 'none';
+  document.getElementById('examPage').style.display  = 'flex';
+  document.getElementById('questionCard').innerHTML  =
+    '<div style="text-align:center;padding:40px 0;color:rgba(255,255,255,.5)"><span class="spinner"></span> Loading questions...</div>';
+
+  const data = await apiFetch('/questions?exam_id=1').catch(() => null);
+
+  if (!data?.success) {
+    document.getElementById('examPage').style.display  = 'none';
+    document.getElementById('homeShell').style.display = 'flex';
+    alert('Failed to load questions. Is the server running?');
+    return;
+  }
+
+  quizData   = data.questions;
+  examConfig = data.exam;
+  totalSeconds = examConfig.time_limit_sec;
+
+  currentQ     = 0;
+  answers      = new Array(quizData.length).fill(null);
+  examStartedAt = Date.now();
+
+  buildDots();
+  renderQuestion();
+  startTimer();
+}
+
+function buildDots() {
+  const row = document.getElementById('dotRow');
+  row.innerHTML = '';
+  quizData.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' current' : '');
+    d.title = 'Q' + (i + 1);
+    d.onclick = () => jumpTo(i);
+    row.appendChild(d);
+  });
+}
+
+function updateDots() {
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.className = 'dot';
+    if (answers[i] !== null) d.classList.add('answered');
+    if (i === currentQ)      d.classList.add('current');
+  });
+}
+
+function jumpTo(i) { currentQ = i; renderQuestion(); }
+
+function renderQuestion() {
+  const q   = quizData[currentQ];
+  const tot = quizData.length;
+
+  document.getElementById('progressText').textContent  = `Question ${currentQ + 1} of ${tot}`;
+  document.getElementById('answeredText').textContent  = `${answers.filter(a => a !== null).length} answered`;
+  document.getElementById('progressFill').style.width  = ((currentQ + 1) / tot * 100) + '%';
+  updateDots();
+
+  let html = `<div class="q-number">Question ${currentQ + 1} / ${tot}</div>
+              <div class="q-text">${q.question}</div>
+              <div class="options-grid">`;
+  q.options.forEach((opt, i) => {
+    const sel = answers[currentQ] === i ? ' selected' : '';
+    html += `<div class="option-btn${sel}" onclick="selectOption(${i})">
+               <div class="option-alpha">${KEYS[i]}</div>
+               <div class="option-label">${opt}</div>
+             </div>`;
+  });
+  html += '</div>';
+  document.getElementById('questionCard').innerHTML = html;
+
+  const isLast = currentQ === tot - 1;
+  document.getElementById('btnPrev').disabled = (currentQ === 0);
+  const nb = document.getElementById('btnNext');
+  if (isLast) { nb.textContent = '✔ Finish'; nb.className = 'btn-nav btn-finish'; nb.onclick = submitQuiz; }
+  else        { nb.textContent = 'Next →';   nb.className = 'btn-nav btn-next';   nb.onclick = nextQuestion; }
+}
+
+function selectOption(idx) {
+  answers[currentQ] = idx;
+  document.querySelectorAll('.option-btn').forEach((b, i) => b.classList.toggle('selected', i === idx));
+  updateDots();
+  document.getElementById('answeredText').textContent = answers.filter(a => a !== null).length + ' answered';
+}
+function prevQuestion() { if (currentQ > 0) { currentQ--; renderQuestion(); } }
+function nextQuestion()  { if (currentQ < quizData.length - 1) { currentQ++; renderQuestion(); } }
+
+function startTimer() {
+  document.getElementById('timer').textContent = formatTime(totalSeconds);
+  document.getElementById('timer').style.color = '';
+  timerInterval = setInterval(() => {
+    totalSeconds--;
+    const el = document.getElementById('timer');
+    el.textContent = formatTime(totalSeconds);
+    if (totalSeconds <= 10) el.style.color = '#ff2d78';
+    if (totalSeconds <= 0)  { clearInterval(timerInterval); submitQuiz(); }
+  }, 1000);
+}
+function formatTime(s) {
+  return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+}
+
+// ─────────────────────────────────────────────
+//  SUBMIT — POST to DB via API
+// ─────────────────────────────────────────────
+async function submitQuiz() {
+  clearInterval(timerInterval);
+
+  const timeTaken = Math.round((Date.now() - examStartedAt) / 1000);
+
+  // Build answers payload
+  const payload = quizData.map((q, i) => ({
+    question_id    : q.id,
+    selected_index : answers[i],          // 0-3 or null
+  }));
+
+  const data = await apiFetch('/attempts', {
+    method: 'POST',
+    body: JSON.stringify({
+      user_id      : currentUser.id,
+      exam_id      : examConfig.id || 1,
+      answers      : payload,
+      time_taken_sec: timeTaken,
+    }),
+  }).catch(() => null);
+
+  let score, total, percentage, status, isNewBest = false;
+
+  if (data?.success) {
+    score      = data.score;
+    total      = data.total;
+    percentage = data.percentage;
+    status     = data.status;
+    // Check if new best by comparing with profile
+    const prev = await apiFetch(`/stats?user_id=${currentUser.id}`).catch(() => null);
+    if (prev?.success) {
+      const prevBest = parseFloat(prev.stats.best_percentage) || 0;
+      // After insert, best should be updated — check if current percentage equals new best
+      // We consider it new best if total_attempts == 1 OR percentage > previous stored best
+      // Simple check: re-fetch and see if best_percentage == current percentage
+      isNewBest = (parseInt(prev.stats.total_attempts) === 1) ||
+                  (parseFloat(percentage) >= parseFloat(prev.stats.best_percentage));
+    }
+  } else {
+    // Fallback: calculate locally if server is down
+    score = answers.filter((a, i) => a === quizData[i].answer).length;
+    total = quizData.length;
+    percentage = parseFloat(((score / total) * 100).toFixed(2));
+    status = percentage >= 50 ? 'PASS' : 'FAIL';
+  }
+
+  lastResult = { score, total, percentage, status, isNewBest };
+
+  document.getElementById('examPage').style.display   = 'none';
+  document.getElementById('resultPage').style.display = 'block';
+
+  document.getElementById('result').innerHTML = `
+    <div class="result-stats">
+      <div class="stat-box"><div class="stat-val">${score}/${total}</div><div class="stat-label">Score</div></div>
+      <div class="stat-box"><div class="stat-val">${parseFloat(percentage).toFixed(1)}%</div><div class="stat-label">Percentage</div></div>
+    </div>
+    ${isNewBest ? `<div style="text-align:center;padding:12px;margin-bottom:12px;border-radius:12px;
+        font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:3px;
+        color:#ffd700;border:1px solid rgba(255,215,0,.3);background:rgba(255,215,0,.07);">
+        ⭐ NEW PERSONAL BEST!</div>` : ''}
+    <div class="status-badge ${status === 'PASS' ? 'pass-badge' : 'fail-badge'}">${status}</div>`;
+}
+
+function goHome() {
+  totalSeconds = 120;
+  document.getElementById('resultPage').style.display = 'none';
+  document.getElementById('examPage').style.display   = 'none';
+  document.getElementById('homeShell').style.display  = 'flex';
+  document.getElementById('timer').style.color        = '';
+  loadProfileStats(lastResult?.isNewBest || false);
+  switchTab('profile');
+}
+
+// ─────────────────────────────────────────────
+//  MISC
+// ─────────────────────────────────────────────
+function showInstructions()  { document.getElementById('instrOverlay').classList.add('active'); }
+function closeInstructions() { document.getElementById('instrOverlay').classList.remove('active'); }
+function showAbout()         { alert('ExamCore v2.0\n\nCyberpunk-themed online exam platform.\nNow powered by MySQL + Node.js backend.\n\n© 2025 ExamCore'); }
+</script>
+</body>
+</html>
